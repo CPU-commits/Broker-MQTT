@@ -13,7 +13,8 @@ var lock = &sync.Mutex{}
 var singleSettings *settings
 
 type settings struct {
-	PORT int8
+	PORT  int16
+	USERS map[string]string
 }
 
 func newSettings() *settings {
@@ -23,7 +24,11 @@ func newSettings() *settings {
 		log.Fatal(err)
 	}
 	return &settings{
-		PORT: int8(port),
+		PORT: int16(port),
+		USERS: map[string]string{
+			// Add all users
+			os.Getenv("USER1"): os.Getenv("PASSWORD1"),
+		},
 	}
 }
 
