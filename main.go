@@ -10,6 +10,7 @@ import (
 
 	"github.com/CPU-commits/broker_mqtt/auth"
 	"github.com/CPU-commits/broker_mqtt/config"
+	"github.com/CPU-commits/broker_mqtt/events"
 	mqtt "github.com/mochi-co/mqtt/server"
 	"github.com/mochi-co/mqtt/server/listeners"
 )
@@ -27,19 +28,29 @@ func main() {
 	}()
 	log.Printf("Mochi MQTT Server initializing...")
 	// Create server
-	server := mqtt.NewServer(nil)
+	options := &mqtt.Options{
+		BufferSize:      0,
+		BufferBlockSize: 0,
+	}
+	server := mqtt.NewServer(options)
 	// Create TCP Listener
 	tcp := listeners.NewTCP(
 		"t1",
 		fmt.Sprintf(":%s", strconv.Itoa(int(settings.PORT))),
 	)
 	// Add Listener to server
+	users := make([]string, len(settings.USERS))
+	for key := range settings.USERS {
+		users = append(users, key)
+	}
 	err := server.AddListener(tcp, &listeners.Config{
 		Auth: &auth.Auth{
 			// Users and password allowed
-			Users: map[string]string{},
+			Users: settings.USERS,
 			// AllowedTopics
-			AllowedTopics: map[string][]string{},
+			AllowedTopics: map[string][]string{
+				"garden/message": users,
+			},
 		},
 	}) // Need to add TLS
 	if err != nil {
@@ -52,6 +63,12 @@ func main() {
 			log.Fatal(err)
 		}
 	}()
+	// Events
+	events := &events.Events{
+		Server: server,
+	}
+	events.Init()
+	// Messages
 	log.Println("Server started")
 	<-done
 
