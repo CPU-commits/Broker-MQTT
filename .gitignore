@@ -1,2 +1,6 @@
 # Env
 .env
+# Logs
+logs.log
+# Main
+main
