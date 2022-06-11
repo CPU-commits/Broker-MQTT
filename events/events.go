@@ -39,6 +39,10 @@ func (e *Events) onDisconnect() {
 				fmt.Sprintf("Client disconnected %s. Error: %s", c.ID, err.Error()),
 			)
 		}
+		client, exists := e.Server.Clients.Get(c.ID)
+		if exists {
+			e.Server.Publish("agent/ondisconnect", []byte(client.Username), false)
+		}
 	}
 }
 
