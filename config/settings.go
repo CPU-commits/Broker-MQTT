@@ -39,8 +39,11 @@ func newSettings() *settings {
 }
 
 func init() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("No .env file")
+	env := os.Getenv("GO_ENV")
+	if env != "prod" {
+		if err := godotenv.Load(); err != nil {
+			log.Fatalf("No .env file")
+		}
 	}
 }
 
