@@ -30,6 +30,7 @@ func newSettings() *settings {
 			// Add all users
 			os.Getenv("USER1"):  os.Getenv("PASSWORD1"),
 			os.Getenv("AGENT1"): string(os.Getenv("PASSWORD2")),
+			os.Getenv("AGENT2"): string(os.Getenv("PASSOWRD3")),
 		},
 		AGENTS: []string{
 			os.Getenv("AGENT1"),
