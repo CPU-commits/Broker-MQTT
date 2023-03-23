@@ -1,38 +1,39 @@
 version: '3.2'
 
 services:
-  nginx-proxy:
-    image: jwilder/nginx-proxy
-    restart: always
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    command:
+      - "--log.level=DEBUG"
+      - "--providers.docker=true"
+      - "--providers.docker.exposeByDefault=false"
+      - "--entrypoints.mqtt.address=:1883"
     ports:
-      - "80:80"
-      - "443:443"
+      - "1883:1883"
+      - "8883:1883"
     volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - /usr/local/ssl/certs:/etc/nginx/certs:ro
-      - /etc/nginx/vhost.d
-      - /usr/share/nginx/html
-    labels:
-      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
-  letsencrypt:
-    image: jrcs/letsencrypt-nginx-proxy-companion
-    restart: always
-    volumes:
-      - /usr/local/ssl/certs:/etc/nginx/certs:rw
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    volumes_from:
-      - nginx-proxy:rw
-  mqtt_broker:
-    container_name: mqtt_broker
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - mqtt
+  mqtt:
+    container_name: mqtt
     image: mqtt_broker
     build:
       context: .
       dockerfile: ./Dockerfile
     expose:
       - 1883
-    environment:
-      - VIRTUAL_HOST=broker.purple-sheep.com
-      - LETSENCRYPT_HOST=broker.purple-sheep.com
-      - LETSENCRYPT_EMAIL=felipecardenas301@gmail.com
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=mqtt"
+      - "traefik.tcp.services.mqtt.loadbalancer.server.port=1883"
+      - "traefik.tcp.routers.tcpr_mqtt.entrypoints=mqtt"
+      - "traefik.tcp.routers.tcpr_mqtt.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.tcpr_mqtt.service=mqtt"
     env_file:
       - .env
+
+networks:
+  mqtt:
+    driver: bridge
