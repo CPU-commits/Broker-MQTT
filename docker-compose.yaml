@@ -1,0 +1,38 @@
+version: '3.2'
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - /usr/local/ssl/certs:/etc/nginx/certs:ro
+      - /etc/nginx/vhost.d
+      - /usr/share/nginx/html
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
+    volumes:
+      - /usr/local/ssl/certs:/etc/nginx/certs:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    volumes_from:
+      - nginx-proxy:rw
+  mqtt_broker:
+    container_name: mqtt_broker
+    image: mqtt_broker
+    build:
+      context: .
+      dockerfile: ./dockerfile
+    expose:
+      - 1883
+    environment:
+      - VIRTUAL_HOST=broker.purple-sheep.com
+      - LETSENCRYPT_HOST=broker.purple-sheep.com
+      - LETSENCRYPT_EMAIL=felipecardenas301@gmail.com
+    env_file:
+      - .env
