@@ -31,6 +31,8 @@ services:
       - "traefik.tcp.routers.tcpr_mqtt.entrypoints=mqtt"
       - "traefik.tcp.routers.tcpr_mqtt.rule=HostSNI(`*`)"
       - "traefik.tcp.routers.tcpr_mqtt.service=mqtt"
+    networks:
+      - mqtt
     env_file:
       - .env
 
