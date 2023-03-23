@@ -27,7 +27,7 @@ services:
     image: mqtt_broker
     build:
       context: .
-      dockerfile: ./dockerfile
+      dockerfile: ./Dockerfile
     expose:
       - 1883
     environment:
