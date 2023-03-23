@@ -7,7 +7,7 @@ services:
     command:
       - "--log.level=DEBUG"
       - "--providers.docker=true"
-      - "--providers.docker.exposeByDefault=false"
+      - "--providers.docker.exposedByDefault=false"
       - "--entrypoints.mqtt.address=:1883"
     ports:
       - "1883:1883"
