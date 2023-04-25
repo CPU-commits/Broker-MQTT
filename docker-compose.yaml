@@ -5,20 +5,29 @@ services:
     image: traefik:latest
     container_name: traefik
     command:
+      - "--api.dashboard=false"
       - "--log.level=DEBUG"
       - "--providers.docker=true"
       - "--providers.docker.exposedByDefault=false"
       - "--entrypoints.mqtt.address=:1883"
+      - "--entrypoints.mqttsecure.address=:8883"
+      - "--providers.docker.network=default"
+      # Letsencrypt
+      - --certificatesresolvers.letsencrypt.acme.tlschallenge=true # <== Enable TLS-ALPN-01 to generate and renew ACME certs
+      - --certificatesresolvers.letsencrypt.acme.email=felipecardenas301@gmail.com
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
     ports:
       - "1883:1883"
       - "8883:1883"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - mqtt
+      - ./letsencrypt:/letsencrypt
+    restart: always
+
   mqtt:
     container_name: mqtt
     image: mqtt_broker
+    restart: always
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -26,16 +35,11 @@ services:
       - 1883
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=mqtt"
-      - "traefik.tcp.services.mqtt.loadbalancer.server.port=1883"
-      - "traefik.tcp.routers.tcpr_mqtt.entrypoints=mqtt"
-      - "traefik.tcp.routers.tcpr_mqtt.rule=HostSNI(`*`)"
-      - "traefik.tcp.routers.tcpr_mqtt.service=mqtt"
-    networks:
-      - mqtt
+      - "traefik.tcp.routers.mqttsecure.rule=Host(`mqtt.purple-sheep.com`)"
+      - "traefik.tcp.routers.mqttsecure.entrypoints=mqttsecure"
+      - "traefik.tcp.routers.mqttsecure.tls=true"
+      - "traefik.tcp.routers.mqttsecure.tls.certresolver=letsencrypt"
+      - "traefik.tcp.services.mqttsecure.loadbalancer.server.port=1883"
+      - "traefik.tcp.routers.mqttsecure.service=mqttsecure"
     env_file:
       - .env
-
-networks:
-  mqtt:
-    driver: bridge
