@@ -37,8 +37,8 @@ services:
       - "traefik.enable=true"
       - "traefik.tcp.routers.mqtt.rule=HostSNI(`mqtt.purple-sheep.com`)"
       - "traefik.tcp.routers.mqtt.entrypoints=mqtt"
-      - "traefik.tcp.routers.mqtt.tls=true"
-      - "traefik.tcp.routers.mqtt.tls.certresolver=letsencrypt"
+      # - "traefik.tcp.routers.mqtt.tls=true"
+      # - "traefik.tcp.routers.mqtt.tls.certresolver=letsencrypt"
     depends_on:
       - traefik
     env_file:
