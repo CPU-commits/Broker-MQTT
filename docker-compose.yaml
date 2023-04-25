@@ -11,17 +11,17 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedByDefault=false"
       - "--entrypoints.mqtt.address=:1883"
-      - "--entrypoints.mqttsecure.address=:8883"
+      # - "--entrypoints.mqttsecure.address=:8883"
       # Letsencrypt
-      - --certificatesresolvers.letsencrypt.acme.tlschallenge=true # <== Enable TLS-ALPN-01 to generate and renew ACME certs
-      - --certificatesresolvers.letsencrypt.acme.email=felipecardenas301@gmail.com
-      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      # - --certificatesresolvers.letsencrypt.acme.tlschallenge=true # <== Enable TLS-ALPN-01 to generate and renew ACME certs
+      # - --certificatesresolvers.letsencrypt.acme.email=felipecardenas301@gmail.com
+      # - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
     ports:
       - "1883:1883"
-      - "8883:8883"
+      # - "8883:8883"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./letsencrypt:/letsencrypt
+      # - ./letsencrypt:/letsencrypt
     restart: always
 
   mqtt:
@@ -35,12 +35,11 @@ services:
       - 1883
     labels:
       - "traefik.enable=true"
-      - "traefik.tcp.routers.mqttsecure.rule=HostSNI(`mqtt.purple-sheep.com`)"
-      - "traefik.tcp.routers.mqttsecure.entrypoints=mqttsecure"
-      - "traefik.tcp.routers.mqttsecure.tls=true"
-      - "traefik.tcp.routers.mqttsecure.tls.certresolver=letsencrypt"
-      - "traefik.tcp.services.mqttsecure.loadbalancer.server.port=1883"
-      - "traefik.tcp.routers.mqttsecure.service=mqttsecure"
+      - "traefik.tcp.routers.mqtt.rule=HostSNI(`mqtt.purple-sheep.com`)"
+      - "traefik.tcp.routers.mqtt.entrypoints=mqtt"
+      - "traefik.tcp.routers.mqtt.tls=true"
+      - "traefik.tcp.routers.mqtt.tls.certresolver=letsencrypt"
+      - "traefik.tcp.routers.mqtt.service=mqtt"
     depends_on:
       - traefik
     env_file:
