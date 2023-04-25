@@ -11,14 +11,13 @@ services:
       - "--providers.docker.exposedByDefault=false"
       - "--entrypoints.mqtt.address=:1883"
       - "--entrypoints.mqttsecure.address=:8883"
-      - "--providers.docker.network=default"
       # Letsencrypt
       - --certificatesresolvers.letsencrypt.acme.tlschallenge=true # <== Enable TLS-ALPN-01 to generate and renew ACME certs
       - --certificatesresolvers.letsencrypt.acme.email=felipecardenas301@gmail.com
       - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
     ports:
       - "1883:1883"
-      - "8883:1883"
+      - "8883:8883"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./letsencrypt:/letsencrypt
