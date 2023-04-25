@@ -39,7 +39,6 @@ services:
       - "traefik.tcp.routers.mqtt.entrypoints=mqtt"
       - "traefik.tcp.routers.mqtt.tls=true"
       - "traefik.tcp.routers.mqtt.tls.certresolver=letsencrypt"
-      - "traefik.tcp.routers.mqtt.service=mqtt"
     depends_on:
       - traefik
     env_file:
