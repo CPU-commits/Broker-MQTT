@@ -6,6 +6,7 @@ services:
     container_name: traefik
     command:
       - "--api.dashboard=false"
+      - "--api.insecure=true"
       - "--log.level=DEBUG"
       - "--providers.docker=true"
       - "--providers.docker.exposedByDefault=false"
@@ -19,7 +20,7 @@ services:
       - "1883:1883"
       - "8883:8883"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./letsencrypt:/letsencrypt
     restart: always
 
@@ -34,7 +35,7 @@ services:
       - 1883
     labels:
       - "traefik.enable=true"
-      - "traefik.tcp.routers.mqttsecure.rule=Host(`mqtt.purple-sheep.com`)"
+      - "traefik.tcp.routers.mqttsecure.rule=HostSNI(`mqtt.purple-sheep.com`)"
       - "traefik.tcp.routers.mqttsecure.entrypoints=mqttsecure"
       - "traefik.tcp.routers.mqttsecure.tls=true"
       - "traefik.tcp.routers.mqttsecure.tls.certresolver=letsencrypt"
