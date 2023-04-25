@@ -41,5 +41,7 @@ services:
       - "traefik.tcp.routers.mqttsecure.tls.certresolver=letsencrypt"
       - "traefik.tcp.services.mqttsecure.loadbalancer.server.port=1883"
       - "traefik.tcp.routers.mqttsecure.service=mqttsecure"
+    depends_on:
+      - traefik
     env_file:
       - .env
