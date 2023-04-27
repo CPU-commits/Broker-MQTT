@@ -41,7 +41,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.tcp.services.mqtt.loadbalancer.server.port=1883"
-      - "traefik.tcp.routers.mqtt.rule=HostSNI(`mqtt.io.purple-sheep.com`)"
+      - "traefik.tcp.routers.mqtt.rule=HostSNI(`mqtt.iot.purple-sheep.com`)"
       - "traefik.tcp.routers.mqtt.entrypoints=securemqtt"
       - "traefik.tcp.routers.mqtt.tls=true"
       - "traefik.tcp.routers.mqtt.tls.certresolver=letsencrypt"
