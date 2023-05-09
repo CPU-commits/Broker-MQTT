@@ -1,34 +1,33 @@
 version: '3.2'
 
 services:
-  traefik:
-    image: traefik:latest
-    container_name: traefik
-    command:
-      - "--api.dashboard=true"
-      - "--log.level=INFO"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedByDefault=false"
-      - "--entrypoints.securemqtt.address=:8883"
+  #traefik:
+  #  image: traefik:latest
+  #  container_name: traefik
+  #  command:
+  #    - "--api.dashboard=true"
+  #    - "--log.level=INFO"
+  #    - "--providers.docker=true"
+  #    - "--providers.docker.exposedByDefault=false"
+  #    - "--entrypoints.securemqtt.address=:8883"
       # - "--entrypoints.mqttsecure.address=:8883"
       # Letsencrypt
-      - --certificatesresolvers.letsencrypt.acme.tlschallenge=true # <== Enable TLS-ALPN-01 to generate and renew ACME certs
-      - --certificatesresolvers.letsencrypt.acme.email=felipecardenas301@gmail.com
-      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
-    ports:
-      - "8883:8883"
-      - "443:443"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./letsencrypt:/letsencrypt
-    restart: always
-    labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.traefik.rule=Host(`traefik.iot.purple-sheep.com`)" # Dashboard domain
-        - "traefik.http.routers.traefik.service=api@internal"
-        - "traefik.http.routers.entrypoints=websecure"
-        - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
-
+  #    - --certificatesresolvers.letsencrypt.acme.tlschallenge=true # <== Enable TLS-ALPN-01 to generate and renew ACME certs
+  #    - --certificatesresolvers.letsencrypt.acme.email=felipecardenas301@gmail.com
+  #    - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+  #  ports:
+  #    - "8883:8883"
+  #    - "443:443"
+  #  volumes:
+  #    - /var/run/docker.sock:/var/run/docker.sock:ro
+  #    - ./letsencrypt:/letsencrypt
+  #  restart: always
+  #  labels:
+  #      - "traefik.enable=true"
+  #      - "traefik.http.routers.traefik.rule=Host(`traefik.iot.purple-sheep.com`)" # Dashboard domain
+  #      - "traefik.http.routers.traefik.service=api@internal"
+  #      - "traefik.http.routers.entrypoints=websecure"
+  #      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
   mqtt:
     container_name: mqtt
     image: mqtt_broker
@@ -36,16 +35,18 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    expose:
-      - 1883
-    labels:
-      - "traefik.enable=true"
-      - "traefik.tcp.services.mqtt.loadbalancer.server.port=1883"
-      - "traefik.tcp.routers.mqtt.rule=HostSNI(`mqtt.iot.purple-sheep.com`)"
-      - "traefik.tcp.routers.mqtt.entrypoints=securemqtt"
-      - "traefik.tcp.routers.mqtt.tls=true"
-      - "traefik.tcp.routers.mqtt.tls.certresolver=letsencrypt"
-    depends_on:
-      - traefik
+    #expose:
+    #  - 1883
+    ports:
+      - 1883:1883
+    #labels:
+    #  - "traefik.enable=true"
+    #  - "traefik.tcp.services.mqtt.loadbalancer.server.port=1883"
+    #  - "traefik.tcp.routers.mqtt.rule=HostSNI(`mqtt.iot.purple-sheep.com`)"
+    #  - "traefik.tcp.routers.mqtt.entrypoints=securemqtt"
+    #  - "traefik.tcp.routers.mqtt.tls=true"
+    #  - "traefik.tcp.routers.mqtt.tls.certresolver=letsencrypt"
+    #depends_on:
+    #  - traefik
     env_file:
       - .env
